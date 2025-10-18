@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write 
+  contents: write
   pages: write
   id-token: write
 
@@ -17,6 +17,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # 关键：在 CI 里确保 themes/next 存在
+      - name: Fetch NexT theme
+        run: |
+          mkdir -p themes
+          if [ ! -d themes/next ]; then
+            git clone --depth=1 https://github.com/theme-next/hexo-theme-next themes/next
+          fi
+          # 可选：确认 scheme 配置在仓库里弄好（themes/next/_config.yml 里是 Gemini）
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -29,7 +38,7 @@ jobs:
           npm install hexo-cli --no-save
 
       - name: Build
-        run: npx hexo generate
+        run: npx hexo generate --debug
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
